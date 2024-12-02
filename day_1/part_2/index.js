@@ -1,8 +1,7 @@
 /**
- * Give 2 lists of numbers
- * Find the smallest pair
- * Find the distance between each pair
- * Output the sum of distances
+ * This time, you'll need to figure out exactly how often each number from the left list appears in the right list. 
+ * Calculate a total similarity score by adding up each number in the left list after multiplying
+ * it by the number of times that number appears in the right list.
  * 
  * 3   3
  * 3   4
@@ -10,7 +9,7 @@
  * 2   5
  * 1   3
  * 3   9
- * Total: 11
+ * Total: 31
  */
 
 import * as fs from 'fs';
@@ -25,17 +24,29 @@ async function readInput(input) {
     }, { list_1: [], list_2: [] })
 }
 
+function makeFrequencyMap(arr) {
+    return arr.reduce((map, val) => {
+        if (!map.get(val)) {
+            map.set(val, 1)
+        } else {
+            map.set(val, map.get(val) + 1)
+        }
+        return map
+    }, new Map())
+}
+
 async function main() {
     const { list_1, list_2 } = await readInput('input.txt')
 
-    const sort_list_1 = list_1.sort()
-    const sort_list_2 = list_2.sort()
-    
-    let total = 0;
-    sort_list_1.forEach((val_1, index) => {
-        total += Math.abs(val_1 - sort_list_2[index])
-    })
-    console.log(total)
+    const freqMap = makeFrequencyMap(list_2)
+    const similarityScore = list_1.reduce((score, val) => {
+        if (!freqMap.get(val)) {
+            return score
+        }
+
+        return score + val * freqMap.get(val)
+    }, 0)
+    console.log(similarityScore)
 }
 
 
